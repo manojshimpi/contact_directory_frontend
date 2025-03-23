@@ -1,6 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from '../../store/userSlice/userActions';
+
 
 function Dashboard() {
+  const dispatch = useDispatch();
+  const user = useSelector((state)=>{
+    return state.user.user;
+  })
+
+  const { status,userData ,postUserdetails,type } = user;
+ 
+   
+  useEffect(()=>{
+      dispatch(fetchUserData())
+    },[dispatch])
+
   return (
     <>
   <section className="section dashboard">
@@ -10,6 +25,7 @@ function Dashboard() {
         <div className="row">
           {/* Sales Card */}
           <div className="col-xxl-4 col-md-6">
+            <h1>Manoj{userData.type}</h1> 
             <div className="card info-card sales-card">
               <div className="filter">
                 <a className="icon" href="#" data-bs-toggle="dropdown"><i className="bi bi-three-dots" /></a>

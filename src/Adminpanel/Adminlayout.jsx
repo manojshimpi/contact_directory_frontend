@@ -3,27 +3,28 @@ import Header from './Component/Header'
 import Leftsidemenu from './Component/Leftsidemenu'
 import Pagetitle from './Component/Pagetitle'
 import { Route, Routes, useNavigate } from 'react-router-dom'
+import Footer from './Component/Footer'
+import PrivateRoute from '../utils/ProtectedRoute/PrivateRoute'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchUserData } from '../store/userSlice/userActions'
-import ContactListPage from './Pages/ContactComponent/ContactListPage'
-import Addgroup from './Pages/GroupComponent/Addgroup'
-import Viewgroup from './Pages/GroupComponent/Viewgroup'
-import PrivateRoute from '../utils/ProtectedRoute/PrivateRoute'
 
 // Lazy load pages
 const Dashboard = React.lazy(() => import('./Pages/Dashboard'))
-const Addcontact = React.lazy(() => import('./Pages/ContactComponent/AddContact'))
-const Profile = React.lazy(() => import('./ProfileComponent/Profile'))
-const FavoriteContactsPage = React.lazy(() => import('./Pages/ContactComponent/FavoriteContactsPage'))
-const AssignContactstoGroups = React.lazy(() => import('./Pages/AssignedContactComponent/AssignContactstoGroups'))
-const ChangePasswordPage = React.lazy(() => import('./ProfileComponent/ChangePasswordPage'))
-const Faq = React.lazy(() => import('./ProfileComponent/Faq'))
-const ContactSupportPage = React.lazy(() => import('./ProfileComponent/ContactSupportPage'))
-const Showallmessage = React.lazy(() => import('./Pages/NotificationComponent/Showallmessage'))
-const Notificationall = React.lazy(() => import('./Pages/NotificationComponent/Notificationall'))
+const Profile = React.lazy(() => import('./Pages/Profile'))
+const Addcontact = React.lazy(() => import('./Pages/Addcontact'))
+const ContactListpage = React.lazy(() => import('./Pages/ContactListpage'))
+const ContactDetailsPage = React.lazy(() => import('./Pages/ContactDetailsPage'))
+const FavoriteContactsPage = React.lazy(() => import('./Pages/FavoriteContactsPage'))
+const GroupsPage = React.lazy(() => import('./Pages/GroupsPage'))
+const AssignContactstoGroups = React.lazy(() => import('./Pages/AssignContactstoGroups'))
+const ChangePasswordPage = React.lazy(() => import('./Pages/ChangePasswordPage'))
+const Faq = React.lazy(() => import('./Pages/Faq'))
+const ContactSupportPage = React.lazy(() => import('./Pages/ContactSupportPage'))
+const Showallmessage = React.lazy(() => import('./Pages/Showallmessage'))
+const Notificationall = React.lazy(() => import('./Notificationall'))
 const ErrorFound = React.lazy(() => import('./ErrorFound'))
 
-function Userlayout() {
+function Adminlayout() {
     const navigate = useNavigate(); // useNavigate hook to navigate to routes
     const dispatch = useDispatch();
     const usertype = useSelector((state)=> state.user.user)
@@ -33,13 +34,11 @@ function Userlayout() {
      dispatch(fetchUserData())
     },[dispatch])
 
-    // if user is admin redirect to admin panel
     useEffect(()=>{
-        if(userData.type==='ADMIN'){
-        navigate('/admin')
-    }
-    },[navigate,userData])
-    
+       if(userData.type==='USER'){
+        navigate('/user')
+       }
+       },[navigate,userData])
 
     return (
         <>
@@ -48,7 +47,6 @@ function Userlayout() {
             <main id="main" className="main">
              {/* <h1>{JSON.stringify(userData,null,2)}</h1>  */}
                 <Pagetitle />
-                
                 <Suspense fallback={
                     <div className="d-flex justify-content-center align-items-center" style={{ height: '10vh' }}>
                         <div className="spinner-border text-primary" role="status">
@@ -60,10 +58,10 @@ function Userlayout() {
                         <Route path='/' element={<Dashboard />} />
                         <Route path='/dashboard' element={<Dashboard />} />
                         <Route path="/addcontact" element={<PrivateRoute><Addcontact /></PrivateRoute>} />
-                        <Route path="/viewcontact" element={<PrivateRoute><ContactListPage /></PrivateRoute>} />
+                        <Route path="/viewcontact" element={<PrivateRoute><ContactListpage /></PrivateRoute>} />
+                        <Route path='/contactdeatils' element={<PrivateRoute><ContactDetailsPage /></PrivateRoute>} />
                         <Route path='/favoritecontact' element={<PrivateRoute><FavoriteContactsPage /></PrivateRoute>} />
-                        <Route path='/addgroup' element={<PrivateRoute><Addgroup /></PrivateRoute>} />
-                        <Route path='/viewgroups' element={<PrivateRoute><Viewgroup /></PrivateRoute>} />
+                        <Route path='/groupage' element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
                         <Route path='/assigngroup' element={<PrivateRoute><AssignContactstoGroups /></PrivateRoute>} />
                         <Route path='/changepassword' element={<PrivateRoute><ChangePasswordPage /></PrivateRoute>} />
                         <Route path='/faq' element={<Faq />} /> {/* No authentication required */}
@@ -76,9 +74,9 @@ function Userlayout() {
 
                 </Suspense>
             </main>{/* End #main */}
-            
+            <Footer />
         </>
     )
 }
 
-export default Userlayout;
+export default Adminlayout;

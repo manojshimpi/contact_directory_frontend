@@ -1,8 +1,23 @@
-import React, { useEffect } from 'react'
-import { NavLink } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom';
+import { logout } from '../../store/userSlice/userActions';
 
-function Header() {
+
+function Header({userdataglobal}) {
+   const navigate = useNavigate();
+   const {name,image,email,type} = userdataglobal
+  
+   /*useEffect(() => {
+    // Check if name is null or empty and redirect to login after a delay
+    if (!name && type !=='USER') {
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000); // Delay for 2 seconds (2000 milliseconds)
+    }
+  }, [name, navigate]); // Add name as a dependency to trigger effect only when `name` changes*/
+  
     useEffect(() => {
+       
         // ✅ Add event listener to toggle sidebar
         const toggleBtn = document.querySelector(".toggle-sidebar-btn");
         const body = document.body;
@@ -14,22 +29,22 @@ function Header() {
         if (toggleBtn) {
           toggleBtn.addEventListener("click", toggleSidebar);
         }
-    
+        
         return () => {
           // ✅ Cleanup event listener to avoid memory leaks
           if (toggleBtn) {
             toggleBtn.removeEventListener("click", toggleSidebar);
           }
         };
-      }, []);
+      });
       
   return (
     <>
      
      <header id="header" className="header fixed-top d-flex align-items-center">
         <div className="d-flex align-items-center justify-content-between">
-          <NavLink to="/" className="logo d-flex align-items-center">
-            <img src="assets/img/logo.png" alt />
+          <NavLink to="/admin/dashboard" className="logo d-flex align-items-center">
+            <img src="/assets/img/logo.png" alt />
             <span className="d-none d-lg-block">NiceAdmin</span>
           </NavLink>
           <i className="bi bi-list toggle-sidebar-btn" />
@@ -168,8 +183,16 @@ function Header() {
             </li>{/* End Messages Nav */}
             <li className="nav-item dropdown pe-3">
               <a className="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                <img src="assets/img/profile-img.jpg" alt="Profile" className="rounded-circle" />
-                <span className="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
+               {
+                !image? ( <img src="/assets/img/profile-img.jpg" alt="Profile" className="rounded-circle"  loading="lazy" />):''
+               
+               }
+               
+
+               <span className="d-none d-md-block dropdown-toggle ps-2">
+               {name ? name.charAt(0).toUpperCase() + name.slice(1) : 'User'}
+              </span>
+
               </a>{/* End Profile Iamge Icon */}
               <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                 <li className="dropdown-header">
@@ -180,7 +203,7 @@ function Header() {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/profile">
+                  <NavLink className="dropdown-item d-flex align-items-center" to="/admin/profile">
                     <i className="bi bi-person" />
                     <span>My Profile</span>
                   </NavLink>
@@ -189,7 +212,7 @@ function Header() {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/changepassword">
+                  <NavLink className="dropdown-item d-flex align-items-center" to="/admin/changepassword">
                     <i className="bi bi-gear" />
                     <span>Account Settings</span>
                   </NavLink>
@@ -198,7 +221,7 @@ function Header() {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/contact">
+                  <NavLink className="dropdown-item d-flex align-items-center" to="/admin/contact">
                     <i className="bi bi-question-circle" />
                     <span>Need Help?</span>
                   </NavLink>
@@ -207,7 +230,7 @@ function Header() {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="#">
+                  <NavLink className="dropdown-item d-flex align-items-center" to="#" onClick={()=>{logout()}}>
                     <i className="bi bi-box-arrow-right" />
                     <span>Sign Out</span>
                   </NavLink>

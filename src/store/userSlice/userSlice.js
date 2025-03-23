@@ -1,45 +1,75 @@
-// src/store/userSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserData, postUserData } from "./userActions"; // Import the actions from userActions.js
+import { fetchUserData, postLoginData, postRegisterData } from "./userActions";
 
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    userData: [],
-    postUserdetails: [],
-    status: "idle", // Initial status
-    error: null, // Error state
+    userData: [], 
+    postLoginDatas: [], 
+    NormalRegisterdata:[], 
+    token: localStorage.getItem("token") || null, // Initialize token from localStorage
+    userRole : localStorage.getItem("userRole") || null, // Initialize token from localStorage
+    status: "idle",
+    error: null, 
   },
-  reducers: {}, // You can add synchronous actions here if needed
+  reducers: {
+    // Action to clear the user data and token
+    clearUserData: (state) => {
+      state.token = null;
+      state.userData = [];
+      state.postLoginDatas = [];
+      localStorage.removeItem("token"); // Clear token from localStorage as well
+      localStorage.removeItem("userRole"); // Clear token from localStorage as well
+    },
+  },
   extraReducers: (builder) => {
-    // Handle fetchUserData
     builder
       .addCase(fetchUserData.pending, (state) => {
-        state.status = "loading"; // Set loading state
+        state.status = "loading";
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
-        state.status = "succeeded"; // Set succeeded state on success
-        state.userData = action.payload; // Store the fetched user data
+        state.status = "succeeded";
+        state.userData = action.payload.user;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
-        state.status = "failed"; // Set failed state on error
-        state.error = action.payload; // Store error message
+        state.status = "failed";
+        state.error = action.payload;
       });
 
-    // Handle postUserData
     builder
-      .addCase(postUserData.pending, (state) => {
-        state.status = "loading"; // Set loading state
+      .addCase(postLoginData.pending, (state) => {
+        state.status = "loading";
       })
-      .addCase(postUserData.fulfilled, (state, action) => {
-        state.status = "succeeded"; // Set succeeded state on success
-        state.postUserdetails = action.payload; // Store the posted data
+      .addCase(postLoginData.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.postLoginDatas = action.payload;
+       
+        if (action.payload.token) {
+          state.token = action.payload.token;
+          state.userRole = action.payload.user.type;
+          localStorage.setItem("token", action.payload.token); // Store token in localStorage
+          localStorage.setItem("userRole", action.payload.user.type); // Store token in localStorage
+        }
       })
-      .addCase(postUserData.rejected, (state, action) => {
-        state.status = "failed"; // Set failed state on error
-        state.error = action.payload; // Store error message
+      .addCase(postLoginData.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(postRegisterData.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(postRegisterData.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.NormalRegisterdata = action.payload;
+      })
+      .addCase(postRegisterData.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       });
   },
 });
 
+export const { clearUserData } = userSlice.actions;
 export default userSlice.reducer;

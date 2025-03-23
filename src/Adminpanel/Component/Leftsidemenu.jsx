@@ -9,7 +9,7 @@ function Leftsidemenu() {
         <aside id="sidebar" className="sidebar">
         <ul className="sidebar-nav" id="sidebar-nav">
             <li className="nav-item">
-            <NavLink className="nav-link " to="/dashboard">
+            <NavLink className="nav-link " to="/admin/dashboard">
                 <i className="bi bi-grid" />
                 <span>Dashboard</span>
             </NavLink>
@@ -20,24 +20,24 @@ function Leftsidemenu() {
             </NavLink>
             <ul id="components-nav" className="nav-content collapse " data-bs-parent="#sidebar-nav">
                 <li>
-               
-                <NavLink to="/viewcontact">
-                    <i className="bi bi-circle" /><span>Contact List Page</span>
-                </NavLink>
-                </li>
                 <li>
-                <NavLink to="/addcontact">
+                <NavLink to="/admin/addcontact">
                     <i className="bi bi-circle" /><span>Add Contact Page</span>
                 </NavLink>
                 </li>
                 
+                <NavLink to="/admin/viewcontact">
+                    <i className="bi bi-circle" /><span>Contact List Page</span>
+                </NavLink>
+                </li>
+                
                 <li>
-                <NavLink to="/contactdeatils">
+                <NavLink to="/admin/contactdeatils">
                     <i className="bi bi-circle" /><span>Contact Details Page</span>
                 </NavLink>
                 </li>
                 <li>
-                <NavLink to="/favoritecontact">
+                <NavLink to="/admin/favoritecontact">
                     <i className="bi bi-circle" /><span>Favorite Contacts Page</span>
                 </NavLink>
                 </li>
@@ -50,12 +50,12 @@ function Leftsidemenu() {
             </NavLink>
             <ul id="forms-nav" className="nav-content collapse " data-bs-parent="#sidebar-nav">
                 <li>
-                <NavLink to="/groupage">
+                <NavLink to="/admin/groupage">
                     <i className="bi bi-circle" /><span>Groups Page</span>
                 </NavLink>
                 </li>
                 <li>
-                <NavLink to="/assigngroup">
+                <NavLink to="/admin/assigngroup">
                     <i className="bi bi-circle" /><span>Assign Contacts to Groups</span>
                 </NavLink>
                 </li>
@@ -67,19 +67,19 @@ function Leftsidemenu() {
       
             <li className="nav-heading">Pages</li>
             <li className="nav-item">
-            <NavLink className="nav-link collapsed" to="/profile">
+            <NavLink className="nav-link collapsed" to="/admin/profile">
                 <i className="bi bi-person" />
                 <span>Profile</span>
             </NavLink>
             </li>{/* End Profile Page Nav */}
             <li className="nav-item">
-            <NavLink className="nav-link collapsed" to="/faq">
+            <NavLink className="nav-link collapsed" to="/admin/faq">
                 <i className="bi bi-question-circle" />
                 <span>F.A.Q</span>
             </NavLink>
             </li>{/* End F.A.Q Page Nav */}
             <li className="nav-item">
-            <NavLink className="nav-link collapsed" to="/contact">
+            <NavLink className="nav-link collapsed" to="/admin/contact">
                 <i className="bi bi-envelope" />
                 <span>Contact</span>
             </NavLink>

@@ -1,6 +1,7 @@
 import { useGoogleLogin } from "@react-oauth/google";
+import { useDispatch } from 'react-redux';
 import { googleAuth } from "./api";
-
+import { fetchUserData } from "../../store/userSlice/userActions";
 
 /**
  * ✅ Global function to handle Google authentication
@@ -8,6 +9,8 @@ import { googleAuth } from "./api";
  * @param {Function} onError - Callback function when login fails
  */
 export const useGoogleAuth = (onSuccess, onError) => {
+  const dispatch = useDispatch();
+
   return useGoogleLogin({
     onSuccess: async (authResult) => {
       try {
@@ -15,15 +18,17 @@ export const useGoogleAuth = (onSuccess, onError) => {
           const result = await googleAuth(authResult.code);
           const { user, token } = result.data;
 
-          //console.log("✅ Google Login Successful:", token);
+          // Store token in localStorage and Redux state
+          localStorage.setItem("token", token); // Save the token to localStorage
+          localStorage.setItem("userRole", user.type? user.type : ""); // Save the token to localStorage
+          
+          //localStorage.setItem("userRole", token); // Save the token to localStorage
+          dispatch(fetchUserData()); // Fetch user data with token
 
-          // Store token
-          localStorage.setItem("token", token);
-
-          // Call onSuccess callback (e.g., navigate to dashboard)
-          if (onSuccess){
-            onSuccess(user, token);
-          } 
+          // Dispatch action to update Redux state with user data
+          if (onSuccess) {
+            onSuccess(user, token); // Redirect or do something else on success
+          }
         } else {
           console.error("❌ Google Login Failed: No code received", authResult);
           if (onError) onError("No code received");
