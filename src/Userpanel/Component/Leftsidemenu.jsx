@@ -58,9 +58,16 @@ function Leftsidemenu() {
                     <i className="bi bi-circle" /><span>View Groups</span>
                 </NavLink>
                 </li>
+
                 <li>
                 <NavLink to="/user/assigngroup">
                     <i className="bi bi-circle" /><span>Assign Contacts to Groups</span>
+                </NavLink>
+                </li>
+
+                <li>
+                <NavLink to="/user/CreatedGroup">
+                    <i className="bi bi-circle" /><span>All Created Groups</span>
                 </NavLink>
                 </li>
                 

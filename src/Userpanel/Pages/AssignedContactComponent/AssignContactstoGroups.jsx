@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Pagination from '../../../utils/Pagination';
-import { deleteContact, fetchContacts } from '../../../store/userSlice/actionContact';
+import { deleteContact } from '../../../store/userSlice/actionContact';
 import { handleExportCSV, handleExportJSON } from '../../../utils/ExportCsv/exportUtils';
 import SearchFilterComponent from '../SortingComponent/SearchFilterComponent';
-import { contactAssignToGroup, fetchGroups } from '../../../store/userSlice/actionGroup';
+import { contactAssignToGroup, fetchContactsToGroup, fetchGroups } from '../../../store/userSlice/actionGroup';
 
 function AssignContactstoGroups() {
   const dispatch = useDispatch();
 
-  const { contacts, loading, error, pagination } = useSelector((state) => state.user.contact);
-  const { groups } = useSelector((state) => state.user.group);
+  const { groups , contactToGroup , loading, error, pagination ,paginations } = useSelector((state) => state.user.group);
   
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [filters, setFilters] = useState({
@@ -28,10 +27,10 @@ function AssignContactstoGroups() {
 
   const [selectedGroup, setSelectedGroup] = useState('');
 
-  const pageContext = 'ContactsListpage';
+  const pageContext = 'Assigngroup';
 
   useEffect(() => {
-    dispatch(fetchContacts({
+    dispatch(fetchContactsToGroup({
       page: pagination?.currentPage || 1,
       filters: { ...filters, isFavorite: 'NO' },
       sort: sort,
@@ -47,30 +46,21 @@ function AssignContactstoGroups() {
   }, [dispatch, pagination?.currentPage, filters, sort]);
 
   const handlePageChange = (page) => {
-    dispatch(fetchContacts({
+    dispatch(fetchContactsToGroup({
       page: page,
       filters: { ...filters, isFavorite: 'NO' },
       sort: sort,
     }));
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this contact?')) {
-      dispatch(deleteContact(id));
-      dispatch(fetchContacts({
-        page: pagination?.currentPage || 1,
-        filters: { ...filters, isFavorite: 'NO' },
-        sort: sort,
-      }));
-    }
-  };
+ 
 
   const handleExportChange = (event) => {
     const selectedOption = event.target.value;
     if (selectedOption === 'csv') {
-      handleExportCSV(contacts);
+      handleExportCSV(contactToGroup);
     } else if (selectedOption === 'json') {
-      handleExportJSON(contacts);
+      handleExportJSON(contactToGroup);
     }
   };
 
@@ -102,7 +92,7 @@ function AssignContactstoGroups() {
         <div className="col-lg-12">
           <div className="card shadow-lg rounded-3">
             <div className="card-body p-4">
-              <h5 className="card-title text-primary mb-4">Contacts List (Active Only)</h5>
+              <h5 className="card-title text-primary mb-4">Contacts List To Assign To Group</h5>
 
               <div className="col-lg-2 mb-4 position-absolute top-0 end-0 mt-4 me-4">
                 <select
@@ -132,7 +122,7 @@ function AssignContactstoGroups() {
                   onChange={handleGroupChange}
                 >
                   <option value="">Select Group</option>
-                  {groups?.map((group) => (
+                  {groups?.filter(group => group.status === 'Active').map((group) => (
                     <option key={group._id} value={group._id}>
                       {group.name}
                     </option>
@@ -148,7 +138,7 @@ function AssignContactstoGroups() {
                 </button>
               </div>
 
-              {contacts?.length ? (
+              {contactToGroup?.length ? (
                 <div className="table-responsive mt-4">
                   <table className="table table-bordered">
                     <thead>
@@ -157,25 +147,25 @@ function AssignContactstoGroups() {
                           <input
                             type="checkbox"
                             onChange={() => {
-                              if (selectedContacts.length === contacts.length) {
+                              if (selectedContacts.length === contactToGroup.length) {
                                 setSelectedContacts([]);
                               } else {
-                                setSelectedContacts(contacts.map((contact) => contact._id));
+                                setSelectedContacts(contactToGroup.map((contact) => contact._id));
                               }
                             }}
-                            checked={selectedContacts.length === contacts.length}
+                            checked={selectedContacts.length === contactToGroup.length}
                           />
                         </th>
                         <th>Name</th>
                         <th>Category</th>
                         <th>Mobile</th>
                         <th>Email</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        
+                       
                       </tr>
                     </thead>
                     <tbody>
-                      {contacts.map((contact) => (
+                      {contactToGroup.map((contact) => (
                         <tr key={contact._id}>
                           <td>
                             <input
@@ -188,22 +178,7 @@ function AssignContactstoGroups() {
                           <td>{contact.category || 'N/A'}</td>
                           <td>{contact.mobile || 'N/A'}</td>
                           <td>{contact.email || 'N/A'}</td>
-                          <td>
-                            <span
-                              className={`badge ${contact.status === 'Active' ? 'bg-success' : 'bg-danger'}`}
-                            >
-                              {contact.status || 'N/A'}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              className="btn btn-outline-danger btn-sm"
-                              onClick={() => handleDelete(contact._id)}
-                              title="Delete Contact"
-                            >
-                              <i className="fas fa-trash"></i>
-                            </button>
-                          </td>
+                          
                         </tr>
                       ))}
                     </tbody>

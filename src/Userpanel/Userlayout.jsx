@@ -9,9 +9,11 @@ import ContactListPage from './Pages/ContactComponent/ContactListPage'
 import Addgroup from './Pages/GroupComponent/Addgroup'
 import Viewgroup from './Pages/GroupComponent/Viewgroup'
 import PrivateRoute from '../utils/ProtectedRoute/PrivateRoute'
+import ContactDeatails from './Pages/GroupComponent/ContactDeatails'
 
 // Lazy load pages
 const Dashboard = React.lazy(() => import('./Pages/Dashboard'))
+const GroupsList  = React.lazy(() => import('./Pages/GroupComponent/GroupsList'))
 const Addcontact = React.lazy(() => import('./Pages/ContactComponent/AddContact'))
 const Profile = React.lazy(() => import('./ProfileComponent/Profile'))
 const FavoriteContactsPage = React.lazy(() => import('./Pages/ContactComponent/FavoriteContactsPage'))
@@ -64,7 +66,9 @@ function Userlayout() {
                         <Route path='/favoritecontact' element={<PrivateRoute><FavoriteContactsPage /></PrivateRoute>} />
                         <Route path='/addgroup' element={<PrivateRoute><Addgroup /></PrivateRoute>} />
                         <Route path='/viewgroups' element={<PrivateRoute><Viewgroup /></PrivateRoute>} />
+                        <Route path='/CreatedGroup' element={<PrivateRoute><GroupsList /></PrivateRoute>} />
                         <Route path='/assigngroup' element={<PrivateRoute><AssignContactstoGroups /></PrivateRoute>} />
+                        <Route path='/GroupwiseConatcts/:id' element={<PrivateRoute><ContactDeatails /></PrivateRoute>} />
                         <Route path='/changepassword' element={<PrivateRoute><ChangePasswordPage /></PrivateRoute>} />
                         <Route path='/faq' element={<Faq />} /> {/* No authentication required */}
                         <Route path='/contact' element={<ContactSupportPage />} /> {/* No authentication required */}

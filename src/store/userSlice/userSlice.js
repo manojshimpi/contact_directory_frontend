@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserData, postLoginData, postRegisterData } from "./userActions";
+import { fetchUserData, postLoginData, postRegisterData, updateprofileData } from "./userActions";
 
 const userSlice = createSlice({
   name: "user",
@@ -55,19 +55,51 @@ const userSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       });
-
+    
+    // Register Normal Form
     builder
       .addCase(postRegisterData.pending, (state) => {
         state.status = "loading";
       })
       .addCase(postRegisterData.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.NormalRegisterdata = action.payload;
+       
+        if(action.payload.status){
+          state.status = action.payload.status;
+        }
+         state.NormalRegisterdata = action.payload;
       })
       .addCase(postRegisterData.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
+        if(action.payload.status){
+          state.status = action.payload.status;
+        }else {
+          state.status = "failed";
+        }
+         state.error = action.payload;
       });
+
+
+      // Update Profile to User
+
+      builder
+      .addCase(updateprofileData.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateprofileData.fulfilled, (state, action) => {
+       
+        if(action.payload.status){
+          state.status = action.payload.status;
+        }
+         //state.NormalRegisterdata = action.payload;
+      })
+      .addCase(updateprofileData.rejected, (state, action) => {
+        if(action.payload.status){
+          state.status = action.payload.status;
+        }else {
+          state.status = "failed";
+        }
+         state.error = action.payload;
+      });
+
   },
 });
 

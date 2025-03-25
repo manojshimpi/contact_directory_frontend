@@ -36,6 +36,163 @@ export const fetchGroups = createAsyncThunk(
     }
   );
 
+  // Fetch Contacts to Group
+  export const fetchContactsToGroup = createAsyncThunk(
+    'group/fetchContactsToGroup',
+    async ({ page = 1, filters, sort }, { rejectWithValue }) => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found in localStorage');
+      }
+      //console.log("I am Action" + JSON.stringify(filters,null,2));
+      const { name, email, mobile , category, status} = filters;
+      const { sortBy, sortOrder } = sort;
+       console
+      try {
+        const response = await fetch(
+          `http://localhost:5000/contacts/getcontactsByGroups?page=${page}&name=${name}&email=${email}&mobile=${mobile}&category=${category}&sortBy=${sortBy}&status=${status}&sortOrder=${sortOrder}`, 
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error('Failed to fetch contacts');
+        }
+  
+        const data = await response.json();
+        //console.log("I am Action" + JSON.stringify(data,null,2));
+        return data;
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    }
+  );
+
+
+  // Fetch Assigned Conatct by user Ids
+   // Fetch Contacts to Group
+   export const fetchAssignedContacts = createAsyncThunk(
+    'group/fetchAssignedContacts',
+    async ({ page = 1, filters, sort }, { rejectWithValue }) => {
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found in localStorage');
+      }
+      
+      //console.log("I am Action" + JSON.stringify(filters,null,2));
+      const { group_name} = filters;
+      //console.log("I am Action" + JSON.stringify(group_name,null,2));
+      const { sortBy, sortOrder } = sort;
+      
+      try {
+        const response = await fetch(
+          `http://localhost:5000/assigncontactgroup/UserwiseAssignedContact?page=${page}&group_name=${group_name}&sortBy=${sortBy}&sortOrder=${sortOrder}`, 
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error('Failed to fetch contacts');
+        }
+  
+        const data = await response.json();
+        //console.log("I am Action Assigned by contact " + JSON.stringify(data,null,2));
+        return data;
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    }
+  );
+
+  //Group Wise contact fetch 
+  export const fetchContactDetails = createAsyncThunk(
+    'group/fetchContactDetails',
+    async (groupID, {rejectWithValue}) => {
+        try {
+          const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found in localStorage');
+        }
+  
+        const response = await fetch(`http://localhost:5000/assigncontactgroup/${groupID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          const status = errorData.status;
+          const message = errorData.message || 'Conatct not found';
+          toast.error(message);
+          return rejectWithValue({ status, message });
+        }
+  
+        const data = await response.json();
+        //console.log("I am Action 1 " + JSON.stringify(data,null,2));
+        return data;
+        
+       } catch (error) {
+            console.error('Error fetching contacts:', error);
+            toast.error(error.message);
+            return rejectWithValue(error.message);
+        }
+        
+    }
+  );
+
+  // Constact Deatils Record Delete
+
+  export const deleteContactDetailsRecord = createAsyncThunk(
+    'group/deleteContactDetailsRecord',
+    async (collectionID, { rejectWithValue }) => {
+     const token = localStorage.getItem('token');
+      if (!token) {
+        const errorMessage = 'No token found in localStorage';
+        toast.error(errorMessage);
+        return rejectWithValue(errorMessage);
+      }
+      try {
+        const response = await fetch(`http://localhost:5000/assigncontactgroup/${collectionID}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          const status = errorData.status;  
+          const message = errorData.message || 'Failed to delete group';
+          toast.error(message);
+          return rejectWithValue({ status, message });
+        } 
+  
+        const data = await response.json();
+        toast.success(data.message? data.message:"Remove contact from group successfully");
+        return data;
+  
+      } catch (error) { 
+        const errorMessage = error.message || 'An unexpected error occurred';
+        toast.error(errorMessage);
+        return rejectWithValue(errorMessage);
+      }
+  }
+  );
+
 
   export const addGroup = createAsyncThunk(
     'group/addGroup',
