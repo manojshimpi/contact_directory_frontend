@@ -48,7 +48,7 @@ function Login() {
   const googleLogin = useGoogleAuth(
     (user, token) => {
       console.log('🎉 User Logged In:', user);
-      navigate('/user'); // Redirect after success
+      navigate('/user/dashboard'); // Redirect after success
     },
     (error) => {
       console.error('❌ Login Failed:', error);
@@ -61,11 +61,11 @@ function Login() {
 
       if (userRole === 'ADMIN') {
         // If the user is an ADMIN, redirect to /admin
-        navigate('/admin');
+        navigate('/admin/dashboard');
         toast.success("Logged in as Admin");
       } else {
         // If the user is not an ADMIN (i.e., USER), redirect to /user
-        navigate('/user');
+        navigate('/user/dashboard');
         toast.success("Login Successfully");
       }
      // After redirection, set hasRedirected to true so it doesn't happen again

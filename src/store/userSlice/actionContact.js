@@ -29,6 +29,7 @@ export const fetchContacts = createAsyncThunk(
       }
 
       const data = await response.json();
+    
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -78,6 +79,7 @@ export const addContact = createAsyncThunk(
 
 export const editContacts = createAsyncThunk('contacts/editContacts',
     async (editdataValue, { rejectWithValue }) => {
+    
     const token = localStorage.getItem('token');
     if (!token) {
       const errorMessage = 'No token found in localStorage';
@@ -157,6 +159,7 @@ export const getContactByuserId = createAsyncThunk(
 export const updateConatcts = createAsyncThunk(
   'contacts/updateConatcts',
   async (contactData, { rejectWithValue }) => {
+    console.log(">>> " + JSON.stringify(contactData,null,2))
     const token = localStorage.getItem('token');
     
     if (!token) {
@@ -323,6 +326,79 @@ export const toggleFavoriteStatus = createAsyncThunk(
       const errorMessage = error.message || 'An unexpected error occurred';
       toast.error(errorMessage);
       return rejectWithValue({ message: errorMessage, status: 'error' });
+    }
+  }
+);
+
+// Get Total Contacts
+
+
+export const fetchTotalContacts = createAsyncThunk(
+  'contacts/fetchTotalContacts',
+  async (TotalConatcts,{ rejectWithValue }) => {
+    console.log('Fetching total contacts');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No token found in localStorage');
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/contacts/getContactTotalCount`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch contacts');
+      }
+
+      const data = await response.json();
+      //console.log(JSON.stringify(data,null,2));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+// Get Toatl Favorite Contacts
+export const fetchTotalFavoriteContacts = createAsyncThunk(
+  'contacts/fetchTotalFavoriteContacts',
+  async (TotalFavoriteConatcts,{ rejectWithValue }) => {
+    console.log('Fetching total contacts');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No token found in localStorage');
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/contacts/getFavoriteContact`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch contacts');
+      }
+
+      const data = await response.json();
+      //console.log(JSON.stringify(data,null,2));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );

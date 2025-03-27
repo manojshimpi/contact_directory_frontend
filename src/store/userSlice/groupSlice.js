@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addGroup, contactAssignToGroup, deleteContactDetailsRecord, deleteGroup, fetchAssignedContacts, fetchContactDetails, fetchContactsToGroup, fetchGroups, getGrouptByuserId, updateGroup, updateGroupStatus } from "./actionGroup";
+import { addGroup, contactAssignToGroup, deleteContactDetailsRecord, deleteGroup, fetchAssignedContacts, fetchContactDetails, fetchContactsToGroup, fetchGroups, fetchTotalGroupsCount, getGrouptByuserId, updateGroup, updateGroupStatus } from "./actionGroup";
 
 const initialState = {
     groups: [],
@@ -7,6 +7,7 @@ const initialState = {
     error: null,
     groupsingleRecord: {},
     contactDetailsArrayObject:{},
+    TotalCountGroups: 0,
     contactToGroup: [],
     assignedContactToGroup: [], // using for the Assing Contact to Group page 
     pagination: {
@@ -190,6 +191,20 @@ const groupSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
               });
+
+                //Toatl Group
+                  builder.addCase(fetchTotalGroupsCount.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(fetchTotalGroupsCount.fulfilled, (state, action) => {
+                    state.loading = false;
+                   
+                    state.TotalCountGroups = action.payload.totalGroupsCounts;
+                })
+                .addCase(fetchTotalGroupsCount.rejected, (state, action) => {
+                    state.loading = false;
+                    state.error = action.error.message;
+                });
         },
     });
     

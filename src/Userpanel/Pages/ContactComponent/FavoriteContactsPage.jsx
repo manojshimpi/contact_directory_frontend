@@ -5,6 +5,7 @@ import { deleteContact, fetchContacts, toggleFavoriteStatus, updateContactStatus
 import EditContactModal from '../EditComponent/EditContactModal';
 import SearchFilterComponent from '../SortingComponent/SearchFilterComponent';
 import { handleExportCSV, handleExportJSON } from '../../../utils/ExportCsv/exportUtils';
+import Flag from 'react-world-flags';
 
 function FavoriteContactsPage() {
   const dispatch = useDispatch();
@@ -139,6 +140,13 @@ function FavoriteContactsPage() {
                             <i className="fas fa-tags me-2"></i>
                             <strong>Category:</strong> {contact.category || 'N/A'}
                           </p>
+
+                           <p className="card-text">
+                            <i className="fas fa-flag me-2"></i>
+                            <strong>Country: </strong>
+                              <Flag code={contact.countryCode || 'US'} style={{ width: 24, height: 24, marginRight: '8px' }} />
+                              {contact.countryName || 'N/A'}
+                            </p>
                           <p className="card-text">
                             <i className="fas fa-phone-alt me-2"></i>
                             <strong>Mobile:</strong> {contact.mobile || 'N/A'}

@@ -196,8 +196,8 @@ function Header({userdataglobal}) {
               </a>{/* End Profile Iamge Icon */}
               <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                 <li className="dropdown-header">
-                  <h6>Kevin Anderson</h6>
-                  <span>Web Designer</span>
+                  <h6>{name ? name.charAt(0).toUpperCase() + name.slice(1) : 'User'}</h6>
+                  <span></span>
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
@@ -211,26 +211,16 @@ function Header({userdataglobal}) {
                 <li>
                   <hr className="dropdown-divider" />
                 </li>
+                
                 <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/user/changepassword">
-                    <i className="bi bi-gear" />
-                    <span>Account Settings</span>
-                  </NavLink>
+                  <hr className="dropdown-divider" />
                 </li>
+                
                 <li>
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/user/contact">
-                    <i className="bi bi-question-circle" />
-                    <span>Need Help?</span>
-                  </NavLink>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="#" onClick={()=>{logout()}}>
+                  <NavLink className="dropdown-item d-flex align-items-center"  onClick={()=>{logout()}}>
                     <i className="bi bi-box-arrow-right" />
                     <span>Sign Out</span>
                   </NavLink>

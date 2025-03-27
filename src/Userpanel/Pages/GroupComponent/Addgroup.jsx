@@ -27,7 +27,7 @@ function Addgroup() {
   return (
     <div className="card shadow-lg my-5 mx-auto" style={{ maxWidth: '600px' }}>
       <div className="card-body">
-        <h5 className="card-title text-center mb-4 text-uppercase font-weight-bold">Add New Group</h5>
+        <h5 className="card-title text-center mb-4 text-uppercase font-weight-bold">Add Group</h5>
 
         {/* Formik Form */}
         <Formik

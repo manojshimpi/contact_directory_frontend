@@ -449,3 +449,39 @@ export const contactAssignToGroup = createAsyncThunk(
     }
   }
 );
+
+// Get Toatl Group Contacts
+export const fetchTotalGroupsCount = createAsyncThunk(
+  'contacts/fetchTotalGroupsCount',
+  async (TotalCountGroups,{ rejectWithValue }) => {
+    console.log('Fetching total contacts');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No token found in localStorage');
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/groups/gettotalgroups`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch contacts');
+      }
+
+      const data = await response.json();
+      console.log(JSON.stringify(data,null,2));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+

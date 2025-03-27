@@ -104,19 +104,76 @@ export const updateprofileData = createAsyncThunk(
     }
 
     try {
+      // Create FormData to append the file and other fields
+      const data = new FormData();
+      // Append the rest of the fields from the formData object
+      Object.keys(formData).forEach(key => {
+        if (key !== "file") {
+          data.append(key, formData[key]);
+        }
+      });
+      // Append the file to the FormData
+      if (formData.file) {
+        data.append('file', formData.file);
+      }
+
       const response = await fetch(`http://localhost:5000/auth/updateprofile`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: data,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         const status = errorData.status || 400;
-        const message = errorData.message || 'Failed to update group';
+        const message = errorData.message || 'Failed to update profile';
+        
+        toast.error(message);
+        return rejectWithValue({ status, message });
+      }
+
+      const dataResponse = await response.json();
+      toast.success(dataResponse.message);
+      return dataResponse;
+
+    } catch (error) {
+      const errorMessage = error.message || 'An unexpected error occurred';
+      toast.error(errorMessage);
+      return rejectWithValue({ message: errorMessage });
+    }
+  }
+);
+
+
+// Testing purpose making action
+export const uploadFileTesting = createAsyncThunk(
+  'user/uploadFileTesting',
+  async (file, { rejectWithValue }) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      const errorMessage = 'No token found in localStorage';
+      toast.error(errorMessage);
+      return rejectWithValue({ message: errorMessage });
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file); // Assuming the file is the input parameter
+      console.log("Form Data", file);
+      const response = await fetch('http://localhost:5000/auth/fileuplaod', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Token included in the Authorization header
+        },
+        body: formData, // Form data containing the file
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const status = errorData.status || 400;
+        const message = errorData.message || 'Failed to update profile image';
         
         toast.error(message);
         return rejectWithValue({ status, message });
@@ -134,6 +191,94 @@ export const updateprofileData = createAsyncThunk(
   }
 );
 
+// Email Notifications For make action
+
+export const emailNotifications = createAsyncThunk(
+  'user/emailNotifications',
+  async (settingData,{ rejectWithValue }) => {
+    
+    const token = localStorage.getItem('token');
+    console.log("Setting " + JSON.stringify(settingData));
+    if (!token) {
+      const errorMessage = 'No token found in localStorage';
+      toast.error(errorMessage);
+      return rejectWithValue({ message: errorMessage, status: 'error' });
+    }
+
+    try {
+       const response = await fetch(`http://localhost:5000/auth/emailnotification`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(settingData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData.message || 'Failed to Email Notification'; 
+        const status = errorData.status || 'error';
+        toast.error(message);
+        return rejectWithValue({ message, status });
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+      return data;
+
+    } catch (error) {
+      const errorMessage = error.message || 'An unexpected error occurred';
+      toast.error(errorMessage);
+      return rejectWithValue({ message: errorMessage, status: 'error' });
+    }
+  }
+);
+
+
+// Update Password updatePassword
+export const updatePassword = createAsyncThunk(
+  'user/updatePassword',
+  async ({newPassword, renewPassword},{ rejectWithValue }) => {
+    
+    const token = localStorage.getItem('token');
+    console.log("Password " + JSON.stringify(newPassword) + " " + JSON.stringify(renewPassword));
+    if (!token) {
+      const errorMessage = 'No token found in localStorage';
+      toast.error(errorMessage);
+      return rejectWithValue({ message: errorMessage, status: 'error' });
+    }
+
+    try {
+       const passwordData = {newPassword, renewPassword};
+       const response = await fetch(`http://localhost:5000/auth/updatenewpassword`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(passwordData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData.message || 'Failed to Email Notification'; 
+        const status = errorData.status || 'error';
+        toast.error(message);
+        return rejectWithValue({ message, status });
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+      return data;
+
+    } catch (error) {
+      const errorMessage = error.message || 'An unexpected error occurred';
+      toast.error(errorMessage);
+      return rejectWithValue({ message: errorMessage, status: 'error' });
+    }
+  }
+);
 
 export const logout = ()=>{
   localStorage.clear(); // Clears all items from localStorage

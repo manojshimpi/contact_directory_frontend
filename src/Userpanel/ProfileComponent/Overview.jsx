@@ -10,7 +10,8 @@ function Overview() {
   }
 
   return (
-    <div className="tab-pane fade show active profile-overview" id="profile-overview">
+   
+     <>
       <h5 className="card-title">About</h5>
       <p className="small fst-italic">{userData.about || 'No information available'}</p>  {/* Dynamically display 'About' */}
       
@@ -33,7 +34,7 @@ function Overview() {
         <div className="col-lg-3 col-md-4 label">Email</div>
         <div className="col-lg-9 col-md-8">{userData.email || 'N/A'}</div>  {/* Dynamically display Email */}
       </div>
-    </div>
+   </>
   );
 }
 

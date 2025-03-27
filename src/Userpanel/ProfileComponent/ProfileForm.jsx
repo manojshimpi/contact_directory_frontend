@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserData, updateprofileData } from '../../store/userSlice/userActions';
+import { fetchUserData, updateprofileData, uploadFileTesting } from '../../store/userSlice/userActions';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { parsePhoneNumber } from 'libphonenumber-js';
@@ -21,15 +21,18 @@ function ProfileForm() {
     dialCode: userData.dial_code,
   });
 
+  const [file, setFile] = useState(null); // Store the selected file
+  const [imagePreview, setImagePreview] = useState(null); // Store image preview URL
+
   const initialValues = {
     fullName: userData.name || '',
     country: userData.country_name || '',
-    phone: userData.phone_number || '', // Ensure this is in E.164 format
+    phone: userData.phone_number || '',
     countryName: userData.country_name,
     countryCode: userData.country_code,
     dialCode: userData.dial_code,
     email: userData.email || '',
-    about: userData.about || '', // Add about field here
+    about: userData.about || '',
   };
 
   const validationSchema = Yup.object({
@@ -42,13 +45,9 @@ function ProfileForm() {
       )
       .test('is-valid-phone', 'Phone number is not valid', (value) => {
         try {
-          // Remove spaces or any non-numeric characters
           const cleanedValue = value.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
-
           if (cleanedValue) {
             const phoneNumber = parsePhoneNumber(cleanedValue);
-
-            // Check if the phone number is valid and has at least 7 digits
             return phoneNumber && phoneNumber.isValid() && phoneNumber.nationalNumber.length >= 7;
           }
           return false;
@@ -58,19 +57,43 @@ function ProfileForm() {
       })
       .required('Phone number is required'),
     country: Yup.string().required('Country is required'),
-    about: Yup.string().max(500, 'About section must be less than 500 characters'), // Add validation for "about"
+    about: Yup.string().max(500, 'About section must be less than 500 characters'),
+    file: Yup.mixed()
+      .test('fileSize', 'File is too large', (value) => !value || value.size <= 5242880) // max 5MB
+      .test('fileFormat', 'Unsupported file format', (value) => !value || ['image/jpeg', 'image/png'].includes(value?.type)),
   });
 
   useEffect(() => {
     dispatch(fetchUserData());
   }, [dispatch]);
 
+  const handleFileChange = (event, setFieldValue) => {
+    const uploadedFile = event.currentTarget.files[0];
+    if (uploadedFile) {
+      setFile(uploadedFile); // Store the selected file in the state
+      setFieldValue('file', uploadedFile); // Set the file to Formik's field value
+
+      // If the uploaded file is an image, generate a preview
+      if (uploadedFile && uploadedFile.type.startsWith('image')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result); // Set image preview
+        };
+        reader.readAsDataURL(uploadedFile);
+      } else {
+        setImagePreview(null); // Clear the preview if not an image
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFile(null);
+    setImagePreview(null);
+  };
+
   const handlePhoneChange = (value, setFieldValue, setFieldError, setFieldTouched) => {
-    const phoneValue = value || ''; // If value is undefined or null, set it to an empty string
-
-    // Clean the phone number by removing spaces and non-numeric characters
+    const phoneValue = value || ''; 
     const cleanedValue = phoneValue.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
-
     if (!cleanedValue || cleanedValue.length < 7 || cleanedValue.length > 15) {
       setCountryInfo({
         countryName: '',
@@ -79,13 +102,12 @@ function ProfileForm() {
       });
       setFieldValue('phone', value);
       setFieldError('phone', 'Phone number must be in E.164 format (e.g., +14155552671)');
-      setFieldTouched('phone', true); // Mark the field as touched
+      setFieldTouched('phone', true); 
       return;
     }
 
     try {
       const phoneNumber = parsePhoneNumber(cleanedValue);
-
       if (phoneNumber && phoneNumber.isValid()) {
         const countryCode = phoneNumber.country;
         const dialCode = phoneNumber.countryCallingCode;
@@ -97,20 +119,20 @@ function ProfileForm() {
           dialCode: `+${dialCode}`,
         });
 
-        setFieldValue('phone', cleanedValue); // Set the phone number in E.164 format
-        setFieldValue('countryName', countryName); // Update country dynamically based on the phone number
-        setFieldError('phone', ''); // Clear the error message when the phone number is valid
-        setFieldTouched('phone', true); // Ensure the field is marked as touched
+        setFieldValue('phone', cleanedValue); 
+        setFieldValue('countryName', countryName); 
+        setFieldError('phone', ''); 
+        setFieldTouched('phone', true); 
       } else {
         setCountryInfo({
           countryName: '',
           countryCode: '',
           dialCode: '',
         });
-        setFieldValue('phone', cleanedValue); // Reset the value if invalid
-        setFieldError('phone', 'Invalid phone number'); // Set the error message
-        setFieldTouched('phone', true); // Mark the field as touched
-        setFieldValue('countryName', '');  // Reset country field if invalid phone number
+        setFieldValue('phone', cleanedValue); 
+        setFieldError('phone', 'Invalid phone number');
+        setFieldTouched('phone', true); 
+        setFieldValue('countryName', '');  
       }
     } catch (error) {
       console.error('Error parsing phone number:', error);
@@ -119,11 +141,12 @@ function ProfileForm() {
         countryCode: '',
         dialCode: '',
       });
-      setFieldError('phone', 'Error parsing phone number'); // Set the error message
-      setFieldTouched('phone', true); // Mark the field as touched
-      setFieldValue('countryName', '');  // Reset country field if error occurs
+      setFieldError('phone', 'Error parsing phone number'); 
+      setFieldTouched('phone', true); 
+      setFieldValue('countryName', '');  
     }
   };
+
 
   const handlePhoneBlur = (setFieldTouched, setFieldError, setFieldValue, value) => {
     setFieldTouched('phone', true); // Mark the field as touched
@@ -181,32 +204,29 @@ function ProfileForm() {
       setFieldError('phone', 'Error parsing phone number');
     }
   };
-  
-  const handleSubmit = async (values) => {
-    // Normalize Email
-    const normalizedEmail = values.email.trim().toLowerCase();
 
-    // Slice Phone Number (Remove Country Code)
+  const handleSubmit = async (values) => {
+    const normalizedEmail = values.email.trim().toLowerCase();
     const phoneNumberObject = parsePhoneNumber(values.phone);
     const phoneNumberSlice = phoneNumberObject ? phoneNumberObject.nationalNumber : '';
 
-    // Prepare the data to be sent (for example, to an API)
     const formData = {
       name: values.fullName,
       email: normalizedEmail,
-      phone_number: values.phone,  // Storing sliced phone number (without country code)
+      phone_number: values.phone,
       country_name: countryInfo.countryName,
-      country_code: countryInfo.countryCode,  // Country code from phone input
-      dial_code: countryInfo.dialCode,  // Dial code from phone input
-      about: values.about, // Add the "about" field value
+      country_code: countryInfo.countryCode,
+      dial_code: countryInfo.dialCode,
+      about: values.about,
+      file: values.file,
     };
-
+    // If a file is selected, dispatch the file upload action
     await dispatch(updateprofileData(formData));
     await dispatch(fetchUserData());
   };
 
   return (
-    <div className="tab-pane fade profile-edit pt-3" id="profile-edit">
+    <>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -219,12 +239,7 @@ function ProfileForm() {
             <div className="row mb-3">
               <label htmlFor="fullName" className="col-md-4 col-lg-3 col-form-label">Full Name</label>
               <div className="col-md-8 col-lg-9">
-                <Field
-                  name="fullName"
-                  type="text"
-                  className="form-control"
-                  id="fullName"
-                />
+                <Field name="fullName" type="text" className="form-control" id="fullName" />
                 <ErrorMessage name="fullName" component="div" className="text-danger" />
               </div>
             </div>
@@ -238,8 +253,8 @@ function ProfileForm() {
                   type="text"
                   className="form-control"
                   id="Country"
-                  value={values.countryName}  // Bind countryName dynamically
-                  readOnly // Make it read-only since it's auto-updated based on the phone number
+                  value={values.countryName} 
+                  readOnly 
                 />
                 <ErrorMessage name="countryName" component="div" className="text-danger" />
               </div>
@@ -263,17 +278,68 @@ function ProfileForm() {
               </div>
             </div>
 
+            {/* File Upload */}
+            <div className="row mb-3">
+            <label htmlFor="profileImage" className="col-md-4 col-lg-3 col-form-label">
+              Profile Image
+            </label>
+            <div className="col-md-8 col-lg-9">
+              {imagePreview || userData.profile_image ? (
+                <img
+                  src={imagePreview || `http://localhost:5000/${userData.profile_image}`} // URL to the image served by your backend
+                  alt="Profile"
+                  className="img-fluid"
+                  style={{ maxHeight: '100px', objectFit: 'contain' }}
+                />
+              ) : (
+                <img
+                  src="../assets/img/profile-img.jpg" // Default image if no image or preview
+                  alt="Profile"
+                  className="img-fluid"
+                  style={{ maxHeight: '100px', objectFit: 'contain' }}
+                />
+              )}
+
+              <div className="pt-2">
+                <label
+                  htmlFor="profileImageUpload"
+                  className="btn btn-primary btn-sm"
+                  title="Upload new profile image"
+                >
+                  <i className="bi bi-upload"></i>
+                  <input
+                    type="file"
+                    name="file"
+                    className="d-none"
+                    onChange={(event) => handleFileChange(event, setFieldValue)}
+                    id="profileImageUpload"
+                    accept=".jpg,.jpeg,.png"
+                  />
+                </label>
+
+                {file && (
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm ms-2"
+                    title="Remove my profile image"
+                    onClick={handleRemoveImage}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+                )}
+
+                {/* Error message for file */}
+                <ErrorMessage name="file" component="div" className="text-danger" />
+              </div>
+            </div>
+          </div>
+
+
             {/* Email */}
             <div className="row mb-3">
               <label htmlFor="Email" className="col-md-4 col-lg-3 col-form-label">Email</label>
               <div className="col-md-8 col-lg-9">
-                <Field
-                  name="email"
-                  type="email"
-                  className="form-control"
-                  id="Email"
-                  readOnly
-                />
+                <Field name="email" type="email" className="form-control" id="Email" readOnly />
                 <ErrorMessage name="email" component="div" className="text-danger" />
               </div>
             </div>
@@ -301,7 +367,7 @@ function ProfileForm() {
           </Form>
         )}
       </Formik>
-    </div>
+      </>
   );
 }
 

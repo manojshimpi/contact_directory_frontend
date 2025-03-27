@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserData, postLoginData, postRegisterData, updateprofileData } from "./userActions";
+import { emailNotifications, fetchUserData, postLoginData, postRegisterData, updatePassword, updateprofileData, uploadFileTesting } from "./userActions";
 
 const userSlice = createSlice({
   name: "user",
@@ -86,19 +86,85 @@ const userSlice = createSlice({
       })
       .addCase(updateprofileData.fulfilled, (state, action) => {
        
-        if(action.payload.status){
+        if (action.payload && action.payload.status) {
           state.status = action.payload.status;
         }
          //state.NormalRegisterdata = action.payload;
       })
       .addCase(updateprofileData.rejected, (state, action) => {
-        if(action.payload.status){
+        if (action.payload && action.payload.status) {
           state.status = action.payload.status;
         }else {
           state.status = "failed";
         }
          state.error = action.payload;
       });
+
+
+      // Testing Purpose File Upload
+      builder
+      .addCase(uploadFileTesting.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(uploadFileTesting.fulfilled, (state, action) => {
+       
+        if (action.payload && action.payload.status) {
+          state.status = action.payload.status;
+        }
+         //state.NormalRegisterdata = action.payload;
+      })
+      .addCase(uploadFileTesting.rejected, (state, action) => {
+        if (action.payload && action.payload.status) {
+          state.status = action.payload.status;
+        }else {
+          state.status = "failed";
+        }
+         state.error = action.payload;
+      });
+
+      // Email Notification Setting emailNotifications
+
+      builder
+      .addCase(emailNotifications.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(emailNotifications.fulfilled, (state, action) => {
+       
+        if (action.payload && action.payload.status) {
+          state.status = action.payload.status;
+        }
+         //state.NormalRegisterdata = action.payload;
+      })
+      .addCase(emailNotifications.rejected, (state, action) => {
+        if (action.payload && action.payload.status) {
+          state.status = action.payload.status;
+        }else {
+          state.status = "failed";
+        }
+         state.error = action.payload;
+      });
+
+      // Update Password updatePassword
+      builder
+      .addCase(updatePassword.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updatePassword.fulfilled, (state, action) => {
+       
+        if (action.payload && action.payload.status) {
+          state.status = action.payload.status;
+        }
+         //state.NormalRegisterdata = action.payload;
+      })
+      .addCase(updatePassword.rejected, (state, action) => {
+        if (action.payload && action.payload.status) {
+          state.status = action.payload.status;
+        }else {
+          state.status = "failed";
+        }
+         state.error = action.payload;
+      });
+
 
   },
 });

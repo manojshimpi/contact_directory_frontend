@@ -1,9 +1,18 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { parsePhoneNumber } from 'libphonenumber-js';
+import countries from 'i18n-iso-countries';
+import en from 'i18n-iso-countries/langs/en.json';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { fetchContacts, getContactByuserId, updateConatcts } from '../../../store/userSlice/actionContact';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+
+countries.registerLocale(en);
 
 const EditContactModal = ({ contactId, handleClose, pagination, filters, sort }) => {
   const dispatch = useDispatch();
@@ -13,32 +22,191 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [countryInfo, setCountryInfo] = useState({
+    countryName: contactsingleRecord?.countryName || '',
+    countryCode: contactsingleRecord?.countryCode || '',
+    dialCode: contactsingleRecord?.dialCode || '',
+  });
+
+  // Fetch contact info on mount
   useEffect(() => {
     if (contactId) {
       dispatch(getContactByuserId(contactId));
     }
   }, [dispatch, contactId]);
 
+  // Wait until contactsingleRecord is available
   const initialValues = {
     id: contactsingleRecord?._id || '',
     name: contactsingleRecord?.name || '',
     email: contactsingleRecord?.email || '',
-    mobile: contactsingleRecord?.mobile || '',
     category: contactsingleRecord?.category || '',
+    country: contactsingleRecord.country_name || '',
+    phone: contactsingleRecord?.mobile || '',
+    countryName: contactsingleRecord?.countryName,
+    countryCode: contactsingleRecord?.countryCode,
+    dialCode: contactsingleRecord?.dialCode,
   };
 
   const validationSchema = Yup.object({
     name: Yup.string().required('Please enter full name!'),
     email: Yup.string().email('Please enter a valid Email address!').required('Please enter email ID!'),
-    mobile: Yup.string().min(10, 'Mobile number must be at least 10 digits!').required('Please enter mobile number!'),
     category: Yup.string().required('Please select a category!'),
+    phone: Yup.string()
+      .matches(/^\+?[1-9]\d{1,14}$/, 'Phone number must be in E.164 format (e.g., +14155552671)')
+      .test('is-valid-phone', 'Phone number is not valid', (value) => {
+        try {
+          const cleanedValue = value.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+          if (cleanedValue) {
+            const phoneNumber = parsePhoneNumber(cleanedValue);
+            return phoneNumber && phoneNumber.isValid() && phoneNumber.nationalNumber.length >= 7;
+          }
+          return false;
+        } catch (error) {
+          return false;
+        }
+      })
+      .required('Phone number is required'),
   });
 
-  const handleSubmit = async (values, { resetForm }) => {
+  const handlePhoneChange = (value, setFieldValue, setFieldError, setFieldTouched) => {
+      const phoneValue = value || ''; 
+      const cleanedValue = phoneValue.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+      if (!cleanedValue || cleanedValue.length < 7 || cleanedValue.length > 15) {
+        setCountryInfo({
+          countryName: '',
+          countryCode: '',
+          dialCode: '',
+        });
+        setFieldValue('phone', value);
+        setFieldError('phone', 'Phone number must be in E.164 format (e.g., +14155552671)');
+        setFieldTouched('phone', true); 
+        return;
+      }
+  
+      try {
+        const phoneNumber = parsePhoneNumber(cleanedValue);
+        if (phoneNumber && phoneNumber.isValid()) {
+          const countryCode = phoneNumber.country;
+          const dialCode = phoneNumber.countryCallingCode;
+          const countryName = countries.getName(countryCode, 'en', { select: 'official' }) || '';
+  
+          setCountryInfo({
+            countryName: countryName,
+            countryCode: countryCode,
+            dialCode: `+${dialCode}`,
+          });
+  
+          setFieldValue('phone', cleanedValue); 
+          setFieldValue('countryName', countryName); 
+          setFieldError('phone', ''); 
+          setFieldTouched('phone', true); 
+        } else {
+          setCountryInfo({
+            countryName: '',
+            countryCode: '',
+            dialCode: '',
+          });
+          setFieldValue('phone', cleanedValue); 
+          setFieldError('phone', 'Invalid phone number');
+          setFieldTouched('phone', true); 
+          setFieldValue('countryName', '');  
+        }
+      } catch (error) {
+        console.error('Error parsing phone number:', error);
+        setCountryInfo({
+          countryName: '',
+          countryCode: '',
+          dialCode: '',
+        });
+        setFieldError('phone', 'Error parsing phone number'); 
+        setFieldTouched('phone', true); 
+        setFieldValue('countryName', '');  
+      }
+    };
+  
+  
+    const handlePhoneBlur = (setFieldTouched, setFieldError, setFieldValue, value) => {
+      setFieldTouched('phone', true); // Mark the field as touched
+      
+      // Ensure value is a valid string before processing
+      const phoneValue = value || ''; // If value is undefined or null, set it to an empty string
+      
+      // Short-circuit: If value is empty, show "required" error
+      if (!phoneValue) return setFieldError('phone', 'Phone number is required');
+    
+      const cleanedValue = phoneValue.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+    
+      // Short-circuit: If the cleaned value exceeds 15 characters, show "too long" error
+      if (cleanedValue.length > 15) return setFieldError('phone', 'Phone number is too long');
+    
+      try {
+        const phoneNumber = parsePhoneNumber(cleanedValue);
+        if (phoneNumber?.isValid()) {
+          setFieldError('phone', ''); // Clear error if valid
+          setFieldValue('phone', cleanedValue); // Set valid phone number
+        } else {
+          setFieldError('phone', 'Invalid phone number'); // Invalid phone
+        }
+      } catch (error) {
+        console.error('Error parsing phone number on blur:', error);
+        setFieldError('phone', 'Error parsing phone number');
+      }
+    };
+  
+    
+  
+  
+    const handlePhoneFocus = (setFieldTouched, setFieldError, setFieldValue, value) => {
+      setFieldTouched('phone', true); // Mark the field as touched when focus occurs
+    
+      // Ensure value is a valid string before processing
+      const phoneValue = value || ''; // If value is undefined or null, set it to an empty string
+    
+      // Clean the phone number by removing spaces and non-numeric characters
+      const cleanedValue = phoneValue.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+    
+      // Short-circuit: If cleaned value exceeds 15 characters, show "too long" error
+      if (cleanedValue.length > 15) return setFieldError('phone', 'Phone number is too long');
+    
+      try {
+        const phoneNumber = parsePhoneNumber(cleanedValue);
+        if (phoneNumber?.isValid()) {
+          setFieldError('phone', ''); // Clear error if valid
+          setFieldValue('phone', cleanedValue); // Set valid phone number
+        } else {
+          setFieldError('phone', 'Invalid phone number'); // Invalid phone number
+        }
+      } catch (error) {
+        console.error('Error parsing phone number on focus:', error);
+        setFieldError('phone', 'Error parsing phone number');
+      }
+    };
+
+  const handleSubmit = async (values) => {
+   
     if (initialValues.id) {
       try {
-        await dispatch(updateConatcts(values)).then((action) => {
+
+        const formData = {
+          id: contactsingleRecord._id,
+          name: values.name,
+          email:values.email,
+          mobile:values.phone,
+          category: values.category,
+          countryName: countryInfo.countryName?  countryInfo.countryName: values.countryName,
+          countryCode: countryInfo.countryCode?countryInfo.countryCode:values.countryCode,
+          dialCode: countryInfo.dialCode? countryInfo.dialCode : values.dialCode,
+         
+        };
+        console.log("Submit Handler  " + JSON.stringify(formData,null,2))
+        await dispatch(updateConatcts(formData)).then((action) => {
           if (action.payload && action.payload.status === '200') {
+            setCountryInfo({
+              countryName: '',
+              countryCode: '',
+              dialCode: '',
+            });
             if (modalRef.current) {
               modalRef.current.style.display = 'none';
               const backdrop = document.querySelector('.modal-backdrop');
@@ -52,10 +220,12 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
               payload: values, 
             });
 
+            
+
             dispatch(fetchContacts({ page: pagination?.currentPage || 1, filters, sort }));
 
             handleClose();
-            
+
             if (location.pathname === '/user/viewcontact') {
               navigate('/user/viewcontact');
             } else {
@@ -69,48 +239,6 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
     }
   };
 
-  const modalStyle = {
-    backdrop: {
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    },
-    modalContent: {
-      borderRadius: '15px',
-      backgroundColor: '#f9f9f9',
-      padding: '20px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    },
-    modalHeader: {
-      borderBottom: '2px solid #ddd',
-      paddingBottom: '20px',
-    },
-    modalTitle: {
-      color: '#333',
-      fontSize: '1.25rem',
-      fontWeight: 'bold',
-    },
-    formField: {
-      borderRadius: '10px',
-      padding: '12px 15px',
-      transition: 'border-color 0.3s ease-in-out',
-    },
-    inputFocus: {
-      borderColor: '#007bff',
-    },
-    button: {
-      backgroundColor: '#007bff',
-      borderColor: '#007bff',
-      borderRadius: '30px',
-      padding: '10px 20px',
-      fontSize: '16px',
-      width: '50%',
-      transition: 'background-color 0.3s ease-in-out',
-    },
-    buttonHover: {
-      backgroundColor: '#0056b3',
-      borderColor: '#0056b3',
-    },
-  };
-
   return (
     <div
       className="modal fade"
@@ -120,12 +248,11 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
       aria-hidden="true"
       ref={modalRef}
       onClick={handleClose}
-      style={modalStyle.backdrop}
     >
       <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content" style={modalStyle.modalContent}>
-          <div className="modal-header" style={modalStyle.modalHeader}>
-            <h5 className="modal-title" id="basicModalLabel" style={modalStyle.modalTitle}>
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id="basicModalLabel">
               Edit Contact
             </h5>
             <button
@@ -141,9 +268,9 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
               initialValues={initialValues}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
-              enableReinitialize
+              enableReinitialize={true}
             >
-              {({ touched, errors }) => (
+              {({ setFieldValue, setFieldError, setFieldTouched, values, touched, errors , isSubmitting }) => (
                 <Form className="row g-3">
                   <div className="col-md-12">
                     <div className="mb-3">
@@ -151,7 +278,6 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
                         type="hidden"
                         name="id"
                         className="form-control"
-                        id="inputName"
                       />
                       <label htmlFor="inputName" className="form-label">
                         Full Name
@@ -160,9 +286,7 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
                         type="text"
                         name="name"
                         className={`form-control ${touched.name && errors.name ? 'is-invalid' : ''}`}
-                        id="inputName"
                         placeholder="Enter your full name"
-                        style={modalStyle.formField}
                       />
                       <ErrorMessage name="name" component="div" className="invalid-feedback" />
                     </div>
@@ -175,26 +299,37 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
                         type="email"
                         name="email"
                         className={`form-control ${touched.email && errors.email ? 'is-invalid' : ''}`}
-                        id="inputEmail"
                         placeholder="Enter your email ID"
-                        style={modalStyle.formField}
                       />
                       <ErrorMessage name="email" component="div" className="invalid-feedback" />
                     </div>
 
                     <div className="mb-3">
-                      <label htmlFor="inputMobile" className="form-label">
-                        Mobile No
-                      </label>
+                      <label htmlFor="Country" className="form-label">Country</label>
                       <Field
+                        name="country"
                         type="text"
-                        name="mobile"
-                        className={`form-control ${touched.mobile && errors.mobile ? 'is-invalid' : ''}`}
-                        id="inputMobile"
-                        placeholder="Enter your mobile number"
-                        style={modalStyle.formField}
+                        className="form-control"
+                        value={values.countryName}
+                        readOnly
                       />
-                      <ErrorMessage name="mobile" component="div" className="invalid-feedback" />
+                      <ErrorMessage name="countryName" component="div" className="text-danger" />
+                    </div>
+
+                    <div className="mb-3">
+                      <label htmlFor="Phone" className="form-label">Phone</label>
+                      <PhoneInput
+                        international
+                        defaultCountry={contactsingleRecord.countryCode || 'US'}
+                        value={values.phone}
+                        onFocus={(e) => handlePhoneFocus(setFieldTouched, setFieldError, setFieldValue, e.target.value)}
+                        onChange={(value) => handlePhoneChange(value, setFieldValue, setFieldError, setFieldTouched)}
+                        onBlur={() => handlePhoneBlur(setFieldTouched, setFieldError, setFieldValue, values.phone)}  // Trigger blur event handler
+                        
+                        className="form-control"
+                        placeholder="Enter phone number"
+                      />
+                      <ErrorMessage name="phone" component="div" className="error-message text-danger" />
                     </div>
 
                     <div className="mb-3">
@@ -205,8 +340,6 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
                         as="select"
                         name="category"
                         className={`form-select ${touched.category && errors.category ? 'is-invalid' : ''}`}
-                        id="inputCategory"
-                        style={modalStyle.formField}
                       >
                         <option value="">Select Category</option>
                         <option value="Family">Family</option>
@@ -218,15 +351,14 @@ const EditContactModal = ({ contactId, handleClose, pagination, filters, sort })
                     </div>
 
                     <div className="d-flex justify-content-center">
-                      <button
-                        type="submit"
-                        className="btn btn-primary mt-3 mb-3"
-                        style={modalStyle.button}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = modalStyle.buttonHover.backgroundColor}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = modalStyle.button.backgroundColor}
-                      >
-                        Update
-                      </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary mt-3 mb-3"
+                     
+                      disabled={isSubmitting}  // Disable the button during submission
+                    >
+                      {isSubmitting ? 'Updating...' : 'Update'}
+                    </button>
                     </div>
                   </div>
                 </Form>

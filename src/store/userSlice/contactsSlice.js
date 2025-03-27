@@ -1,10 +1,12 @@
 import { createSlice} from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
-import { addContact, deleteContact, editContacts, fetchContacts, getContactByuserId, toggleFavoriteStatus, updateConatcts, updateContactStatus } from './actionContact';
+import { addContact, deleteContact, editContacts, fetchContacts, fetchTotalContacts, fetchTotalFavoriteContacts, getContactByuserId, toggleFavoriteStatus, updateConatcts, updateContactStatus } from './actionContact';
 
 const initialState = {
     contacts: [],
     contactsingleRecord: {},
+    TotalConatcts: 0,
+    TotalFavoriteConatcts: 0,
     loading: false,
     error: null,
     status: null,
@@ -155,6 +157,33 @@ const contactsSlice = createSlice({
                     state.status = 'error';
                 }
                 state.error = action.payload ? action.payload.message : 'Failed to update status';
+            });
+             //TotalConatcts
+            builder.addCase(fetchTotalContacts.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTotalContacts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.TotalConatcts = action.payload.totalContacts;
+            })
+            .addCase(fetchTotalContacts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            });
+
+            // Get Total Favorite Contacts
+              //TotalConatcts
+              builder.addCase(fetchTotalFavoriteContacts.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTotalFavoriteContacts.fulfilled, (state, action) => {
+                state.loading = false;
+                //console.log("action.payload.totalFavoriteContacts", action.payload.totalFavoriteContacts);
+                state.TotalFavoriteConatcts = action.payload.totalFavoriteContacts;
+            })
+            .addCase(fetchTotalFavoriteContacts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
             });
     }
 });

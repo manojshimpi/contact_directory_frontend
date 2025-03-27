@@ -1,7 +1,8 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
 function Leftsidemenu() {
+    const location = useLocation();
   return (
     <>
        {/* ======= Sidebar ======= */}
@@ -15,10 +16,14 @@ function Leftsidemenu() {
             </NavLink>
             </li>{/* End Dashboard Nav */}
             <li className="nav-item">
-            <NavLink className="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" to="#">
+            <NavLink className="nav-link collapsed show" data-bs-target="#components-nav" data-bs-toggle="collapse" to="#">
                 <i className="bi bi-menu-button-wide" /><span>Contact Management</span><i className="bi bi-chevron-down ms-auto" />
             </NavLink>
-            <ul id="components-nav" className="nav-content collapse " data-bs-parent="#sidebar-nav">
+            <ul
+                id="components-nav"
+                className={`nav-content collapse${location.pathname === "/user/addcontact" || location.pathname === "/user/viewcontact" || location.pathname === "/user/favoritecontact" ? " show" : ""}`}
+                data-bs-parent="#sidebar-nav"
+                >
                 
                 <li>
                 <NavLink to="/user/addcontact">
@@ -46,7 +51,7 @@ function Leftsidemenu() {
             <NavLink className="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" to="#">
                 <i className="bi bi-journal-text" /><span>Group Managment</span><i className="bi bi-chevron-down ms-auto" />
             </NavLink>
-            <ul id="forms-nav" className="nav-content collapse " data-bs-parent="#sidebar-nav">
+            <ul id="forms-nav" className={`nav-content collapse ${location.pathname === "/user/addgroup" || location.pathname === "/user/viewgroups" || location.pathname === "/user/assigngroup" || location.pathname === "/user/CreatedGroup" ? " show" : ""}`} data-bs-parent="#sidebar-nav">
                 <li>
                 <NavLink to="/user/addgroup">
                     <i className="bi bi-circle" /><span>Add Group</span>
@@ -77,24 +82,20 @@ function Leftsidemenu() {
           
       
             <li className="nav-heading">Pages</li>
+            
             <li className="nav-item">
-            <NavLink className="nav-link collapsed" to="/user/profile">
+            <NavLink className={`nav-link collapsed ${location.pathname === "/user/profile" ? "active" : ""}`} to="/user/profile">
                 <i className="bi bi-person" />
                 <span>Profile</span>
             </NavLink>
             </li>{/* End Profile Page Nav */}
             <li className="nav-item">
-            <NavLink className="nav-link collapsed" to="/user/faq">
+            <NavLink className={`nav-link collapsed ${location.pathname === "/user/faq" ? "active" : ""}`} to="/user/faq">
                 <i className="bi bi-question-circle" />
                 <span>F.A.Q</span>
             </NavLink>
             </li>{/* End F.A.Q Page Nav */}
-            <li className="nav-item">
-            <NavLink className="nav-link collapsed" to="/user/contact">
-                <i className="bi bi-envelope" />
-                <span>Contact</span>
-            </NavLink>
-            </li>{/* End Contact Page Nav */}
+           
            
         </ul>
         </aside>{/* End Sidebar*/}

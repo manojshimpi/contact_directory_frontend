@@ -82,7 +82,7 @@ function Viewgroup() {
         <div className="col-lg-12">
           <div className="card shadow-lg rounded-3">
             <div className="card-body p-4">
-              <h5 className="card-title text-primary mb-4">Groups List</h5>
+              <h5 className="card-title text-primary mb-4">All Created Groups</h5>
 
               {/* Export Dropdown */}
               <div className="col-lg-2 mb-4 position-absolute top-0 end-0 mt-4 me-4">
