@@ -12,6 +12,7 @@ import { isValidPhoneNumber } from 'react-phone-number-input';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import countries from 'i18n-iso-countries';
 import en from 'i18n-iso-countries/langs/en.json';
+import logo from '../assets/logo5.png'
 
 countries.registerLocale(en);
 
@@ -37,8 +38,8 @@ function Register() {
     email: Yup.string().email('Please enter a valid Email address!').required('Please enter email ID!'),
     password: Yup.string().min(6, 'Password must be at least 6 characters!').required('Please enter your password!'),
     phoneNumber: Yup.string()
-      .required('Phone number is required')
-      .test('is-valid-phone', 'Please enter a valid phone number with country code', (value) => {
+      .required('Mobile number is required')
+      .test('is-valid-phone', 'Please enter a valid mobile number with country code', (value) => {
         return value ? isValidPhoneNumber(value) : false;
       }),
   });
@@ -105,20 +106,17 @@ function Register() {
   };
 
   return (
-    <div>
+    <div className="register-background">
       <main>
         <div className="container">
           <section className="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
             <div className="container">
               <div className="row justify-content-center">
-                <div className="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                <div className="col-lg-5 col-md-6 d-flex flex-column align-items-center justify-content-center">
                   <div className="d-flex justify-content-center py-4">
-                    <a href="index.html" className="logo d-flex align-items-center w-auto">
-                      <img src="assets/img/logo.png" alt />
-                      <span className="d-none d-lg-block">NiceAdmin</span>
-                    </a>
+                   <img className="" src={logo}  style={{height:'auto', width:"400px"}}/>
                   </div>
-                  <div className="card mb-3">
+                  <div className="card mb-0">
                     <div className="card-body">
                       <div className="pt-4 pb-2">
                         <h5 className="card-title text-center pb-0 fs-4">Create an Account</h5>
@@ -170,7 +168,7 @@ function Register() {
                               <ErrorMessage name="password" component="div" className="invalid-feedback" />
                             </div>
                             <div className="col-12">
-                              <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                              <label htmlFor="phoneNumber" className="form-label">Mobile</label>
                               <Field name="phoneNumber">
                                 {({ field, form }) => (
                                   <div>
@@ -214,7 +212,7 @@ function Register() {
                       </Formik>
                     </div>
                   </div>
-                  <div className="col-12 mt-4">
+                  <div className="col-12 mt-2">
                     <button
                       onClick={googleLogin}
                       className="btn btn-google w-100 d-flex justify-content-center align-items-center p-3 border rounded-4 shadow-lg"

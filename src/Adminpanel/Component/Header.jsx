@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../../store/userSlice/userActions';
-
+import logo from '../../assets/logo5.png'
 
 function Header({userdataglobal}) {
    const navigate = useNavigate();
@@ -43,10 +43,10 @@ function Header({userdataglobal}) {
      
      <header id="header" className="header fixed-top d-flex align-items-center">
         <div className="d-flex align-items-center justify-content-between">
-          <NavLink to="/admin/dashboard" className="logo d-flex align-items-center">
-            <img src="/assets/img/logo.png" alt />
-            <span className="d-none d-lg-block">NiceAdmin</span>
-          </NavLink>
+         
+           <NavLink to="/admin/dashboard" className=" d-flex align-items-center">
+            <img className="" src={logo} style={{ width: '270px', height: 'auto' }} />
+            </NavLink>
           <i className="bi bi-list toggle-sidebar-btn" />
         </div>{/* End Logo */}
         <div className="search-bar">
@@ -196,36 +196,14 @@ function Header({userdataglobal}) {
               </a>{/* End Profile Iamge Icon */}
               <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                 <li className="dropdown-header">
-                  <h6>Kevin Anderson</h6>
-                  <span>Web Designer</span>
+                  <h6> {name ? name.charAt(0).toUpperCase() + name.slice(1) : 'User'}</h6>
+                 
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
                 </li>
-                <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/admin/profile">
-                    <i className="bi bi-person" />
-                    <span>My Profile</span>
-                  </NavLink>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/admin/changepassword">
-                    <i className="bi bi-gear" />
-                    <span>Account Settings</span>
-                  </NavLink>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <NavLink className="dropdown-item d-flex align-items-center" to="/admin/contact">
-                    <i className="bi bi-question-circle" />
-                    <span>Need Help?</span>
-                  </NavLink>
-                </li>
+               
+                
                 <li>
                   <hr className="dropdown-divider" />
                 </li>

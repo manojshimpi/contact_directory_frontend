@@ -262,7 +262,7 @@ function ProfileForm() {
 
             {/* Phone Number with Country Flags */}
             <div className="row mb-3">
-              <label htmlFor="Phone" className="col-md-4 col-lg-3 col-form-label">Phone</label>
+              <label htmlFor="Phone" className="col-md-4 col-lg-3 col-form-label">Mobile</label>
               <div className="col-md-8 col-lg-9">
                 <PhoneInput
                   international

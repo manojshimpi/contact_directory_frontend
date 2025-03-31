@@ -79,7 +79,7 @@ function Dashboard() {
   <section className="section dashboard">
     <div className="row">
       {/* Left side columns */}
-      <div className="col-lg-8">
+      <div className="col-lg-9">
         <div className="row">
           {/* Sales Card */}
           <div className="col-xxl-4 col-md-6">
@@ -196,7 +196,7 @@ function Dashboard() {
         </div>
       </div>{/* End Left side columns */}
       {/* Right side columns */}
-      <div className="col-lg-4">
+      <div className="col-lg-3">
       {/* Recent Activity */}
       <div className="card">
      

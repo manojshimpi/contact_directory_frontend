@@ -242,7 +242,7 @@ export const updatePassword = createAsyncThunk(
   async ({newPassword, renewPassword},{ rejectWithValue }) => {
     
     const token = localStorage.getItem('token');
-    console.log("Password " + JSON.stringify(newPassword) + " " + JSON.stringify(renewPassword));
+    //console.log("Password " + JSON.stringify(newPassword) + " " + JSON.stringify(renewPassword));
     if (!token) {
       const errorMessage = 'No token found in localStorage';
       toast.error(errorMessage);

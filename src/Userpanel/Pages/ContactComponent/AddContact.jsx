@@ -37,8 +37,8 @@ function Addcontact() {
     email: Yup.string().email('Please enter a valid Email address!').required('Please enter email ID!'),
     category: Yup.string().required('Please select a category!'),
     phoneNumber: Yup.string()
-      .required('Phone number is required')
-      .test('is-valid-phone', 'Please enter a valid phone number with country code', (value) => {
+      .required('Mobile number is required')
+      .test('is-valid-phone', 'Please enter a valid mobile number with country code', (value) => {
         return value ? isValidPhoneNumber(value) : false;
       }),
   });
@@ -146,7 +146,7 @@ function Addcontact() {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                  <label htmlFor="phoneNumber" className="form-label form-label-custom">Mobile</label>
                   <Field name="phoneNumber">
                     {({ field, form, touched, errors }) => (
                       <div>
@@ -160,7 +160,7 @@ function Addcontact() {
                             setFieldValue('phoneNumber', value);
                             handlePhoneChange(value, setFieldValue);
                           }}
-                          placeholder="Enter phone number"
+                          placeholder="Enter Mobile Number"
                           style={{
                             padding: '10px',
                             width: '100%',

@@ -9,6 +9,7 @@ import { postLoginData } from '../store/userSlice/userActions';
 import { toast } from 'react-toastify';
 import { clearUserData } from '../store/userSlice/userSlice';
 import { useGoogleAuth } from '../utils/GoogleAuth/googleAuth';
+import logo from '../assets/logo5.png'
 
 
 
@@ -34,7 +35,7 @@ function Login() {
   // Initial values for the form
   const initialValues = {
     email: 'manoj@gmail.com',
-    password: '12345678'
+    password: '123456'
   };
 
   // Submit handler for the form
@@ -90,19 +91,17 @@ function Login() {
 
   return (
     <>
-      <div>
+      <div className="login-background">
         <main>
           <div className="container">
             <section className="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
               <div className="container">
                 <div className="row justify-content-center">
-                  <div className="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                  <div className="col-lg-5 col-md-6 d-flex flex-column align-items-center justify-content-center">
                     <div className="d-flex justify-content-center py-4">
-                      <a href="#" className="logo d-flex align-items-center w-auto">
-                        <img src="assets/img/logo.png" alt />
-                        <span className="d-none d-lg-block">NiceAdmin</span>
-                      </a>
+                    <img className="" src={logo}  style={{height:'auto', width:"400px"}}/>
                     </div>
+                     
                     <div className="card mb-3">
                       <div className="card-body">
                         <div className="pt-4 pb-2">
@@ -170,7 +169,7 @@ function Login() {
                     </div>
 
                     {/* Google Login Button */}
-                    <div className="col-12 mt-4">
+                    <div className="col-12 mt-0">
                       <button 
                         onClick={googleLogin} 
                         className="btn btn-google w-100 d-flex justify-content-center align-items-center p-3 border rounded-4 shadow-lg"

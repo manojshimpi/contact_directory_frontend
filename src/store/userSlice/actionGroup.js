@@ -454,7 +454,7 @@ export const contactAssignToGroup = createAsyncThunk(
 export const fetchTotalGroupsCount = createAsyncThunk(
   'contacts/fetchTotalGroupsCount',
   async (TotalCountGroups,{ rejectWithValue }) => {
-    console.log('Fetching total contacts');
+   
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('No token found in localStorage');

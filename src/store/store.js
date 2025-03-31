@@ -3,10 +3,11 @@ import adminRducer from "./adminSlice/adminSlice";
 import userReducer from "./userSlice/userSlice";
 import errorMiddleware from "./middleware/errorMiddleware";
 import rootReducer from "./userSlice/rootReducer";
+import adminRootReducer from "./adminSlice/adminRootReducer";
 
 const store = configureStore({
     reducer:{
-       admin: adminRducer,
+       admin: adminRootReducer,
        user: rootReducer,
         // Add more reducers here if needed...
      },

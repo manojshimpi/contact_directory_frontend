@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../../store/userSlice/userActions';
-
+import logo from '../../assets/logo5.png'
 
 function Header({userdataglobal}) {
    const navigate = useNavigate();
@@ -43,9 +43,8 @@ function Header({userdataglobal}) {
      
      <header id="header" className="header fixed-top d-flex align-items-center">
         <div className="d-flex align-items-center justify-content-between">
-          <NavLink to="/user/dashboard" className="logo d-flex align-items-center">
-            <img src="/assets/img/logo.png" alt />
-            <span className="d-none d-lg-block">NiceAdmin</span>
+          <NavLink to="/user/dashboard" className=" d-flex align-items-center">
+          <img className="" src={logo} style={{ width: '270px', height: 'auto' }} />
           </NavLink>
           <i className="bi bi-list toggle-sidebar-btn" />
         </div>{/* End Logo */}
